@@ -1,0 +1,65 @@
+require "io"
+require "table"
+require "useful"
+
+-- 
+-- Parse a text line full of 2-digit numbers.
+--
+function parse_line(theline)
+	 retVal={}
+	 kk = 1
+	 for n in theline:gmatch("%d%d") do
+	     retVal[kk]=n
+	     kk = kk+1
+	 end
+	 return retVal
+end
+
+--
+-- Sort routine to do a rev sort
+--
+function rev_comp(a,b)
+   retval=false
+   if ( a > b ) then
+      retval=true
+   end
+   return retval
+end
+
+
+--
+-- Find the nth biggest number in a row and return its
+-- index number.
+--
+function find_nth_biggest_num_in_row(therow,n)
+   sorted_value_table={}
+   index_table={}
+   useful.copytable(therow,sorted_value_table)
+   table.sort(sorted_value_table,rev_comp)
+   nth_row_value=sorted_value_table[n]
+   row_index=1
+   while row_index <= #therow do
+      if ( therow[row_index] == nth_row_value ) then
+         table.insert(index_table,row_index)
+      end
+      row_index=row_index+1
+   end
+   return index_table
+end
+
+
+
+-- Main Line
+
+rownum=1
+rowtable={}
+for myline in io.lines() 
+do
+    table.insert(rowtable,parse_line(myline))
+    rownum = rownum + 1
+end
+
+nth_b=1
+for kk=1,#rowtable-1 do
+    print(nth_b .. " Biggest in row " .. kk .. ":" .. table.concat(find_nth_biggest_num_in_row(rowtable[kk],nth_b)," "))
+end
