@@ -28,12 +28,23 @@ function test_mul()
    print(first:tostring().. " * " .. twost:tostring() .." = " .. sum:tostring())  
 end
 
+function test_sub()
+
+   first = bignum.new(108)
+   twost = bignum.new(17)
+
+   sum = first - twost
+   print(first:tostring() .. " - " .. twost:tostring() .. " = " .. sum:tostring() )
+   sum = twost - first
+  print(twost:tostring() .. " - " .. first:tostring() .. " = " .. sum:tostring())
+
+end
 --
 -- Find sum of digits
 --
 function test_add_digits()
   bignum_tester = bignum.new("203")
-  print("Tester: " .. bignum_tester:tostring() .. " Sum digits: " .. bignum_tester:sum_digits() )
+  print("Tester: " .. bignum_tester:tostring() .. " Sum digits: " .. bignum_tester:sum_digits():tostring() )
 end
 
 -- main line
@@ -43,6 +54,10 @@ print("From number: " .. my_bignum:tostring())
 test_add()
 test_mul()
 test_add_digits()
-
-
-
+my_bignum = my_bignum + 1
+print("My_bignum + 1 equals: ")
+my_bignum:print()
+my_bignum = my_bignum * 4
+print("My_bignum * 4 equals: ")
+my_bignum:print()
+test_sub() 
