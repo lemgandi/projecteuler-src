@@ -46,7 +46,7 @@ end,
 -- Print an array to the screen.
 print_array = function(tb)
    for nn,mm in ipairs(tb) do
-      print("Number: "..nn.." Value: ",mm)      
+      print("Number: "..nn.." Value: ",mm,"Type: ",type(mm))      
    end
 end,
 

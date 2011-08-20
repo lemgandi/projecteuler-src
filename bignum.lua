@@ -12,7 +12,25 @@ bignum={}
 
 bignum.my_bignum={}
 
+
+-- Convert bignum to a string
+function bignum.tostring(self)
+   local s=""
+   for kk,jj in ipairs(self.my_num) do
+      s=s .. jj
+   end
+   if self.neg_flag then
+      s=s .. "-"
+   end
+   s=s:reverse()
+   return s
+end
+
+bignum.__tostring = bignum.tostring
+
+--
 -- Multiply a table by one digit (used in __mul)
+--
 function bignum.mul_by_one_digit(icand,ator)
    local answer_t={}
    local answer_t_index=1
@@ -46,21 +64,101 @@ function bignum.mul_by_one_digit(icand,ator)
 end
 
 --
--- Which of a pair of bignum tables represents the lesser number?
+-- Which of a pair of bignum tables represents the lesser
+-- absolute value?
 --
-function bignum.lessorequal_table(table1,table2)
+function bignum.abs_lessorequal_table(table1,table2)
+
    t1,t2=bignum.equalize_tables(table1,table2)
-   retVal=0
-   for kk=1,#t1 do
+
+   local abs_retval=0
+   for kk=#t1,1,-1 do
       if t1[kk] > t2[kk] then
-         retVal=1
+         abs_retval=1
       end
       if t1[kk] < t2[kk] then
-         retVal=-1
+         abs_retval=-1
       end
-      if retVal ~= 0 then
+      if abs_retval ~= 0 then
          break
       end
+   end
+   return abs_retval
+end
+--
+-- Which of a pair of bignum tables represents the lesser number?
+--
+function bignum.lessorequal_table(table1,negflag1,table2,negflag2)
+   local retVal=0 -- Assume equality
+   local status=true
+
+   -- (-1) always < (1)
+   if negflag1 and not negflag2 then 
+      retVal=-1
+      status=false
+   end
+   -- (1) always > (-1)
+   if not negflag1 and negflag2 then
+      retVal=1
+      status=false
+   end
+   if status == true then
+      abs_equality=bignum.abs_lessorequal_table(table1,table2)
+      -- if both numbers are positive or they are equal, abs equality 
+      -- equals equality.
+      retVal=abs_equality
+      -- If both numbers are negative and unequal, equality relation is 
+      -- reversed.
+      -- We have already eliminated unequal negflags above.
+      if negflag1 and abs_equality ~= 0 then
+         retVal = -abs_equality
+      end   
+   end
+   return retVal
+end
+
+--
+-- Is this object equal to another bignum?
+--
+function bignum.__eq(self,other)
+   local retVal=false
+   if 0 == bignum.lessorequal_table(self.my_num,self.neg_flag,other.my_num,other.neg_flag) then
+      retVal=true
+   end
+   return retVal
+end
+
+--
+-- Is this object less than another bignum?
+--
+function bignum.__lt(self,other)
+   local retVal=false
+   if -1 == bignum.lessorequal_table(self.my_num,self.neg_flag,other.my_num,other.neg_flag) then
+      retVal=true
+   end
+   return retVal
+end
+
+function bignum.__gt(self,other)
+   local retVal=false
+   if 1 == bignum.lessorequal_table(self.my_num,self.neg_flag,other.my_num,other.neg_flag) then
+      retVal=true
+   end
+   return retVal
+end
+
+function bignum.__le(self,other)
+   local retVal=true
+   if 1 == bignum.lessorequal_table(self.my_num,self.neg_flag,other.my_num,other.neg_flag) then
+      retVal=false
+   end
+   return retVal
+end
+
+function bignum.__ge(self,other)
+   local retVal=true
+   if -1 == bignum.lessorequal_table(self.my_num,self.neg_flag,other.my_num,other.neg_flag) then
+      retVal=false
    end
    return retVal
 end
@@ -68,11 +166,11 @@ end
 -- Subtract one bignum table from another.
 function bignum.sub_table(table1,table2)
 
-   neg_flag=false
+   local neg_flag=false
 
    -- Always subtract abs lesser from abs greater. 
    -- Set negative if necessary.
-   if bignum.lessorequal_table(table1,table2) < 0 
+   if bignum.abs_lessorequal_table(table1,table2) < 0 
    then
       t2,t1=bignum.equalize_tables(table1,table2)
       neg_flag=true
@@ -102,8 +200,8 @@ end
 -- Pad with 0 as necessary.
 --
 function bignum.equalize_tables(t1,t2)
-   retval1={}
-   retval2={}
+   local retval1={}
+   local retval2={}
    useful.copytable(t1,retval1)
    useful.copytable(t2,retval2)
    len_diff= #retval1 - #retval2
@@ -123,9 +221,15 @@ end
 -- Add a pair of bignum tables to produce a table of the sum.
 -- Used in __add, __mul routines.
 function bignum.add_table(table1,table2)
+   local my_add_t={}
+   local other_add_t={}
    my_add_t,other_add_t=bignum.equalize_tables(table1,table2)
-   answer_t={}
-   remainder=0
+
+   local answer_t={}
+   local remainder=0
+   local answer=0
+   local remainder=0
+
    for kk=1,#my_add_t do      
       answer=my_add_t[kk]+other_add_t[kk]
       if remainder > 0 then
@@ -145,32 +249,77 @@ function bignum.add_table(table1,table2)
    return answer_t
 end
 
--- Subtract a pair of bignums..
-function bignum.__sub(self,other_bignum)
-
-   if type(other_bignum) ~= "table" then
-      other_bignum=bignum.new(other_bignum)
+function bignum.polymorph(self,other)
+   local retVal=other
+   if type(other) ~= "table" then
+      retVal=bignum.new(other)
+      if other and other < 0 then
+         retVal.neg_flag=true
+      end
    end
+   if getmetatable(retVal) ~= getmetatable(self) then
+      retVal=bignum.new(other)
+   end
+   return retVal
+end
+
+--
+-- Subtract a pair of bignums.
+--
+function bignum.__sub(self,other_bignum)
+   local other_bignum=self:polymorph(other_bignum)
+   local neg_flag
+   local answer_t
 
    answer_t,neg_flag=self.sub_table(self.my_num,other_bignum.my_num)   
-
-   retVal=bignum.new(answer_t)
+   
+   kk=#answer_t
+   while answer_t[kk] == 0 do
+      answer_t[kk]=nil
+      kk=kk-1
+   end   
+   local retVal=bignum.new(answer_t)
    retVal.neg_flag=neg_flag
    return retVal
 end
 
+--
+-- Divide one bignum by another.
+--
+function bignum.__div(self,o)
+
+   local other=self:polymorph(o)
+
+   assert(other ~= bignum.new(0),"Divide by zero")
+
+   local qtyzero=bignum.new(0)
+
+   local retVal=bignum.new(0)
+
+   intermediate_value=bignum.new(self.my_num)
+    while intermediate_value > qtyzero do
+      intermediate_value = intermediate_value - other
+      if intermediate_value >= qtyzero then
+         retVal = retVal + 1
+      end
+   end
+   return retVal
+end
+
+--
 -- Multiply a pair of bignums
+--
 function bignum.__mul(self,other_bignum)
 
-   if (type(other_bignum) ~= "table") then
-      other_bignum=bignum.new(other_bignum)
-   end
+   local other_bignum=self:polymorph(other_bignum)
 
-   multiplicand={}
+   local multiplicand={}
    useful.copytable(self.my_num,multiplicand)
-   multiplicator={}
+   local multiplicator={}
    useful.copytable(other_bignum.my_num,multiplicator)
-   answer_accumulator={}
+   local answer_accumulator={}
+   local intermediate={}
+
    for jj,kk in ipairs(multiplicator) do
       intermediate=self.mul_by_one_digit(multiplicand,kk)
       if jj == 1 then
@@ -182,20 +331,20 @@ function bignum.__mul(self,other_bignum)
          answer_accumulator=self.add_table(answer_accumulator,intermediate)
       end
    end
-   retVal=bignum.new(answer_accumulator)
+   local retVal=bignum.new(answer_accumulator)
+   if (multiplicand.neg_flag and not self.neg_flag) or (self.neg_flag and not muliplicand.neg_flag) then
+      retVal.neg_flag=true
+   end
    return retVal   
 end
 
 -- Add a pair of bignums
-function bignum.__add(self,other_bignum)
+function bignum.__add(self,o_bignum)
 
--- Allow bignum + int, et cetera.
-   if type(other_bignum) ~= "table" then
-      other_bignum=bignum.new(other_bignum)
-   end
+   local other_bignum=self:polymorph(o_bignum)
 
    answer_t=self.add_table(self.my_num,other_bignum.my_num)
-   retVal=bignum.new(answer_t)
+   local retVal=bignum.new(answer_t)
    return retVal
 end
 
@@ -209,31 +358,19 @@ function bignum.print(self)
   print(self:tostring())
 end
 
--- Convert bignum to a string
-function bignum.tostring(self)
-   s=""
-   mytable={}
-   useful.copytable(self.my_num,mytable)
-   for kk=#mytable,1,-1 do
-      if mytable[kk] == 0 then
-         mytable[kk]=nil
-      end
-   end
-   for kk,jj in ipairs(mytable) do
-      s=s .. jj
-   end
-   if self.neg_flag then
-      s=s .. "-"
-   end
-   s=s:reverse()
-   return s
+
+bignum.__concat = function(self,other)
+   return (self:tostring() .. other )
 end
+
 
 --
 -- Add all the digits in bignum together. 
 --
 function bignum.sum_digits(self)
-   retval=bignum.new(0)
+   local retval=bignum.new(0)
+   local ll=0
+   local kk=0
    for ll,kk in ipairs(self.my_num) do
       retval = retval + kk
    end
@@ -258,15 +395,21 @@ function bignum.new(t)
    my_bignum.neg_flag=false
 
    local fromstr=function(s)
+        if s[0] == '-' then
+           my_bignum.neg_flag=true
+        end
         s=s:reverse()
         local idx=1
         for n in s:gmatch("%d") do
-           my_bignum.my_num[idx]=n
+           my_bignum.my_num[idx]=n+0
            idx=idx+1
         end
    end
 
    local fromnum=function(n)
+      if n < 0 then
+         my_bignum.neg_flag=true
+      end
       local my_str=n..""
       fromstr(my_str)
    end
