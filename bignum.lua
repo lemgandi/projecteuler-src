@@ -250,6 +250,7 @@ function bignum.add_table(table1,table2)
 end
 
 function bignum.polymorph(self,other)
+
    local retVal=other
    if type(other) ~= "table" then
       retVal=bignum.new(other)
@@ -284,6 +285,30 @@ function bignum.__sub(self,other_bignum)
 end
 
 --
+-- Get bignum modulo. 
+--
+function bignum.__mod(self,o)
+
+   local other=self:polymorph(o)
+
+   assert(other ~= bignum.new(0),"Divide by zero")
+
+   -- This gets assigned a value. 
+   local retVal=bignum.new(self.my_num)
+
+    local intermediate_value=bignum.new(self.my_num)
+    while intermediate_value > bignum.zero do
+      retVal=intermediate_value;
+      -- Handle special case where modulo == 0
+      if intermediate_value == other then
+         retVal=bignum.new(0)
+      end
+      intermediate_value = intermediate_value - other      
+   end
+   return retVal
+end
+
+--
 -- Divide one bignum by another.
 --
 function bignum.__div(self,o)
@@ -292,14 +317,12 @@ function bignum.__div(self,o)
 
    assert(other ~= bignum.new(0),"Divide by zero")
 
-   local qtyzero=bignum.new(0)
-
+   -- This gets assigned a value. 
    local retVal=bignum.new(0)
-
-   intermediate_value=bignum.new(self.my_num)
-    while intermediate_value > qtyzero do
+    local intermediate_value=bignum.new(self.my_num)
+    while intermediate_value > bignum.zero do
       intermediate_value = intermediate_value - other
-      if intermediate_value >= qtyzero then
+      if ( intermediate_value >= bignum.zero) then
          retVal = retVal + 1
       end
    end
@@ -357,9 +380,23 @@ end
 function bignum.print(self)
   print(self:tostring())
 end
+--
+-- Raise bignum to a power.
+--
+function bignum.__pow(self,o)
 
+   local other=self:polymorph(o)
 
-bignum.__concat = function(self,other)
+   local retVal=bignum.new(self.my_num)
+
+   while other > bignum.one do
+      other = other - 1   
+      retVal=retVal * self
+   end
+   return retVal
+end
+
+function bignum.__concat(self,other)
    return (self:tostring() .. other )
 end
 
@@ -433,3 +470,14 @@ function bignum.new(t)
    return my_bignum
 
 end
+
+function bignum.__newindex(t,k,v)
+--   print("Set bignum." .. k)
+   assert(k ~= "zero","Attempt to set read-only \"zero\" value")
+   assert(k ~= "one", "Attempt to set read-only \"one\" value")
+   rawset(t,k,v)      
+end
+
+-- Useful Constants ( should be read-only)
+bignum["zero"]=bignum.new(0)
+bignum["one"]=bignum.new(1)

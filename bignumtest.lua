@@ -2,10 +2,10 @@
 require "bignum"
 
 function test_add()
-   first=bignum.new("84")
-   twost=bignum.new("17")
-   sum=first+twost
-   print(first:tostring() .. " + " .. twost:tostring() .." = " .. sum:tostring())
+   local first=bignum.new("84")
+   local twost=bignum.new("17")
+   local sum=first+twost
+   print(first .. " + " .. twost .." = " .. sum .. "")
    twost:set_directly({1})
    sum=first+twost
    print(first .. " + " .. twost .." = " .. sum .. "")
@@ -15,51 +15,56 @@ function test_add()
    print(first .. " + " .. twost .." = " .. sum .. "")   
    first:set_directly({1})
    sum=first+twost
-   print(first .. " + " .. twost .." = " .. sum .. "")   
+   print(first .. " + " .. twost .." = " .. sum .. "")      
 end
 
 function test_mul()
-   first=bignum.new("1709")
-   twost=bignum.new("22")
-   sum=first * twost
+   local first=bignum.new("1709")
+   local twost=bignum.new("22")
+   local sum=first * twost
    print(first .. " * " .. twost .." = " .. sum .. "")   
    first:set_directly({8,2})
    twost:set_directly({7,3,4})
    sum=first*twost
    print(first .. " * " ..twost .." = " .. sum .. "")  
+   local next = bignum.new(2)
+   local pow = bignum.new(5)
+   sum = next ^ pow
+   print(next .. " ^ " .. pow .. " = " .. sum .. "")
 end
 
 function test_sub()
 
-   first = bignum.new("108")
-   twost = bignum.new("17")
+   local first = bignum.new("108")
+   local twost = bignum.new("17")
 
-   sum = first - twost
+   local sum = first - twost
    print(first .. " - " .. twost .. " = " .. sum:tostring() )
    sum = twost - first
    print(twost .. " - " .. first .. " = " .. sum:tostring() )  
-   another=bignum.new(1111)
-   next=bignum.new(999)
+   local another=bignum.new(1111)
+   local next=bignum.new(999)
    this_sum=another-next
-   print(another .. " - " .. next .. " = " .. this_sum:tostring())
+   print(another .. " - " .. next .. " = " .. this_sum .. "")
 end
+
 --
 -- Find sum of digits
 --
 function test_add_digits()
-  bignum_tester = bignum.new("203")
+  local bignum_tester = bignum.new("203")
   print("Tester: " .. bignum_tester .. " Sum digits: " .. bignum_tester:sum_digits() .. "" )
 end
 
 function test_relations()
-   bigint = 2000
-   smallint=40
-   large = bignum.new(bigint)
-   small = bignum.new(smallint)
+   local bigint = 2000
+   local smallint=40
+   local large = bignum.new(bigint)
+   local small = bignum.new(smallint)
 
    print(large .. " > " .. small .. ":" .. tostring(large>small))
    print(small .. " < " .. large .. ":" .. tostring(small<large))
-   big = bignum.new(bigint)
+   local big = bignum.new(bigint)
 
    print(big .. "==" .. large .. ":" .. tostring(big == large))
    print(big .. "<=" .. large .. ":" .. tostring(big <= large))
@@ -68,8 +73,8 @@ function test_relations()
 end
 
 function test_neg()
-   bigger=bignum.new(12)
-   smaller=bignum.new(-12)
+   local bigger=bignum.new(12)
+   local smaller=bignum.new(-12)
    print(bigger .. " > " .. smaller .. " : " .. tostring(bigger > smaller))
    print(bigger .. " < " .. smaller .. " : " .. tostring(bigger < smaller)) 
    print(bigger .. " == " .. smaller .. " : " .. tostring(bigger == smaller))
@@ -81,13 +86,19 @@ end
 
 
 function test_div()
-   numerator=bignum.new(238)
-   denominator=7
+   local numerator=bignum.new(238)
+   local denominator=7
    local answer = numerator / denominator
-   print( numerator .. "/" .. denominator .." = " .. answer .. "")
+   print( numerator .. " / " .. denominator .." = " .. answer .. "")
    denominator=10
    answer = numerator / denominator
-   print( numerator .. "/" .. denominator .. "=" .. answer .. "")
+   print( numerator .. " / "  .. denominator .. " = " .. answer .. "")
+   answer = numerator % denominator
+   print( numerator .. " % " .. denominator .. " = " .. answer .. "")
+   denominator=7
+   answer = numerator % denominator
+   print( numerator .. " % " .. denominator .. " = " .. answer .. "")
+
 end
 
 -- main line
@@ -106,4 +117,9 @@ my_bignum:print()
 test_sub() 
 test_relations()
 test_neg()
+test_div()
+
+print("This should fail on an assert")
+bignum.zero = bignum.new(44)
+print("Bignum.zero:" .. bignum.zero .. "")
 test_div()
