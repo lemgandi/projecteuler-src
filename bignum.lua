@@ -397,7 +397,7 @@ function bignum.__pow(self,o)
 end
 
 function bignum.__concat(self,other)
-   return (self:tostring() .. other )
+   return (self:__tostring() .. other )
 end
 
 
@@ -471,6 +471,38 @@ function bignum.new(t)
 
 end
 
+-- 
+-- Convenience for square root
+--
+function bignum.sqrt(self)
+   return self:root(2)
+end
+--
+-- Find nth root of bignum
+--
+function bignum.root(self,o)
+   local other=self:polymorph(o)
+   local testval=bignum.new(1)
+   local topval=bignum.new(1)
+   local bottomval=nil
+
+   while testval < self do
+      topval=topval+1
+      testval = topval ^ o
+   end
+
+   if testval == self then
+      bottomval=topval
+   else
+      bottomval=topval - 1
+   end
+
+   return topval,bottomval   
+end
+
+
+-- 
+-- Force constants to be constant ( does not seem to workee )
 function bignum.__newindex(t,k,v)
 --   print("Set bignum." .. k)
    assert(k ~= "zero","Attempt to set read-only \"zero\" value")

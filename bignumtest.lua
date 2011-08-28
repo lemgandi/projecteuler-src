@@ -98,7 +98,12 @@ function test_div()
    denominator=7
    answer = numerator % denominator
    print( numerator .. " % " .. denominator .. " = " .. answer .. "")
-
+   local perfect=bignum.new(289)
+   local top,bottom=perfect:sqrt()
+   print("Square root of " .. perfect .. " = " .. top .. " " .. bottom .. "")
+   perfect=bignum.new(125)
+   top,bottom=perfect:root(3)
+   print("Cube root of " .. perfect .. " = " .. top .. " " .. bottom .. "")
 end
 
 -- main line
@@ -122,4 +127,4 @@ test_div()
 print("This should fail on an assert")
 bignum.zero = bignum.new(44)
 print("Bignum.zero:" .. bignum.zero .. "")
-test_div()
+-- test_div()
