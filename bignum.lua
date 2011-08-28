@@ -500,6 +500,50 @@ function bignum.root(self,o)
    return topval,bottomval   
 end
 
+function bignum.recursive_fact(n)
+   if n == bignum.zero then
+      return 1
+   else
+      return  n * bignum.recursive_fact(n-1)
+   end
+end
+
+--
+-- Recursive function to compute my factorial.
+-- ( should be a local but recursion apparently prevents this)
+-- 
+function bignum.recursive_fact(n)
+   if bignum.zero == n then
+      return 1
+   else
+      return n * bignum.recursive_fact(n-1)
+   end
+end
+
+-- 
+-- Factorial for bignums
+--
+function bignum.factorial(self)
+   local retVal=bignum.new(self.my_num)
+   return self.recursive_fact(retVal)
+end
+
+--
+-- Find all factors of given number
+--
+function bignum.find_factors(self)
+   local retVal={bignum.new(1)}
+   local my_sqrt_ceil,my_sqrt_floor = self:sqrt()
+   local this_factor=bignum.new(1)
+   while this_factor <= my_sqrt_floor do
+      if bignum.zero == self % this_factor and this_factor ~= bignum.one then
+         retVal[#retVal+1]=this_factor
+         retVal[#retVal+1]=self / this_factor
+      end
+      this_factor = this_factor + 1
+   end
+   return retVal
+end
 
 -- 
 -- Force constants to be constant ( does not seem to workee )

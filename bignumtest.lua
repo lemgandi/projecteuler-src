@@ -31,6 +31,8 @@ function test_mul()
    local pow = bignum.new(5)
    sum = next ^ pow
    print(next .. " ^ " .. pow .. " = " .. sum .. "")
+   five=bignum.new(5)
+   print( five .. " ! is " .. five:factorial() .. " (Should be 120)")
 end
 
 function test_sub()
@@ -104,6 +106,16 @@ function test_div()
    perfect=bignum.new(125)
    top,bottom=perfect:root(3)
    print("Cube root of " .. perfect .. " = " .. top .. " " .. bottom .. "")
+   perfect = perfect + 17
+   top,bottom=perfect:root(3)
+   print("Cube root of " .. perfect .. " = " .. top .. " " .. bottom .. "")
+end
+
+function test_special()
+   twelve=bignum.new(12)
+   factors=twelve:find_factors()
+   print("Factors of " .. twelve .. ":")
+   useful.print_array(factors)
 end
 
 -- main line
@@ -123,6 +135,7 @@ test_sub()
 test_relations()
 test_neg()
 test_div()
+test_special()
 
 print("This should fail on an assert")
 bignum.zero = bignum.new(44)
