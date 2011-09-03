@@ -532,13 +532,18 @@ end
 -- Find all factors of given number
 --
 function bignum.find_factors(self)
-   local retVal={bignum.new(1)}
+   local retVal={}
    local my_sqrt_ceil,my_sqrt_floor = self:sqrt()
    local this_factor=bignum.new(1)
    while this_factor <= my_sqrt_floor do
-      if bignum.zero == self % this_factor and this_factor ~= bignum.one then
+      if bignum.zero == self % this_factor then
          retVal[#retVal+1]=this_factor
          retVal[#retVal+1]=self / this_factor
+         -- Handle special case of a perfect square and 1
+         if retVal[#retVal - 1] == retVal[#retVal] or retVal[#retVal] == self
+         then
+            retVal[#retVal]=nil
+         end
       end
       this_factor = this_factor + 1
    end

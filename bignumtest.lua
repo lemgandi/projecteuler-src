@@ -116,6 +116,10 @@ function test_special()
    factors=twelve:find_factors()
    print("Factors of " .. twelve .. ":")
    useful.print_array(factors)
+   twenty_five=bignum.new(25)
+   factors=twenty_five:find_factors()
+   print("Factors of " .. twenty_five .. ":")
+   useful.print_array(factors)
 end
 
 -- main line
