@@ -75,5 +75,37 @@ is_prime = function(number)
    return retVal
 end,
 
-  
+--
+-- Return a table of all factors of given n
+--
+find_factors = function(n)
+   local retVal={}
+   local my_sqrt_floor=math.floor(math.sqrt(n))
+   local this_factor=1
+   while this_factor <= my_sqrt_floor do
+      if 0 == n % this_factor then
+         retVal[#retVal+1]=this_factor
+         retVal[#retVal+1]=n / this_factor
+         -- Handle special case of a perfect square and 1
+         if retVal[#retVal - 1] == retVal[#retVal] or retVal[#retVal] == n
+         then
+            retVal[#retVal]=nil
+         end
+      end
+      this_factor = this_factor + 1
+   end
+   return retVal
+end,
+
+--
+-- Sum a table
+--
+sumtable=function(t)
+   local sum=0
+   local kk=0
+   for kk=1,#t do
+      sum = sum + t[kk]
+   end
+   return sum
+end,
 }
