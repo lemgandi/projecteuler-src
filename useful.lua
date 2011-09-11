@@ -108,4 +108,46 @@ sumtable=function(t)
    end
    return sum
 end,
+
+--
+-- Default compare routine for binsearch of a table
+default_bin_search_test = function(a,b)
+   local retVal=0
+   if a > b then
+      retVal=1
+   end
+   if a < b then
+      retVal=-1
+   end
+   return retVal
+end,
+
+--
+-- Binary search a sorted table.
+--
+bin_search = function(n,table,first,last,tester)
+
+   if nil == tester then
+      tester=useful.default_bin_search_test
+   end
+
+   local retVal=nil   
+
+   if first > last then
+      retVal=nil
+   else 
+      local mid=math.floor((first+last)/2)
+      local testerVal=tester(n,table[mid])
+      if -1 == testerVal then
+         retVal=useful.bin_search(n,table,first,mid-1,tester)
+      elseif 1 == testerVal then
+         retVal=useful.bin_search(n,table,mid+1,last,tester)
+      else
+         retVal=mid
+      end
+   end
+   return retVal
+end,
+
+
 }
