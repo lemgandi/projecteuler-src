@@ -17,7 +17,7 @@ bignum.my_bignum={}
 function bignum.tostring(self)
    local s=""
    for kk,jj in ipairs(self.my_num) do
-      s=s .. jj
+      s=s .. string.format("%d",jj)
    end
    if self.neg_flag then
       s=s .. "-"
@@ -526,6 +526,16 @@ end
 function bignum.factorial(self)
    local retVal=bignum.new(self.my_num)
    return self.recursive_fact(retVal)
+end
+
+--
+-- How many digits does bignum contain?
+--
+function bignum.len_digits(self)
+   bignumStr=self:tostring()
+   retVal=bignumStr:len()
+   retVal=bignum.new(retVal)
+   return retVal
 end
 
 --
