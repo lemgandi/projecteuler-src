@@ -406,10 +406,8 @@ end
 --
 function bignum.sum_digits(self)
    local retval=bignum.new(0)
-   local ll=0
-   local kk=0
    for ll,kk in ipairs(self.my_num) do
-      retval = retval + kk
+      retval = retval + math.floor(kk)
    end
    return retval
 end
