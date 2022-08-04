@@ -285,6 +285,32 @@ function bignum.__sub(self,other_bignum)
 end
 
 --
+-- What is the biggest power of n which is smaller than bignum?
+--
+function bignum.find_biggest_pow(self,o)
+
+   assert(o ~= nil,"Cannot find power of null")
+   assert(o ~= 0,"Cannot find power of 0")
+   
+   local other = self:polymorph(o)   
+   local limit = other ^ 2
+ 
+   local powcount=bignum.new(1)
+   local result=bignum.new(0)
+   local real_result=bignum.new(0)
+   local real_powcount=bignum.new(0)
+   while self - result > limit
+   do
+     real_result=result
+     real_powcount=powcount
+     powcount = powcount + 1
+     result = other ^ powcount
+   end
+   
+   return real_result,real_powcount
+end
+
+--
 -- Get bignum modulo. 
 --
 function bignum.__mod(self,o)
@@ -498,14 +524,6 @@ function bignum.root(self,o)
    return topval,bottomval   
 end
 
-function bignum.recursive_fact(n)
-   if n == bignum.zero then
-      return 1
-   else
-      return  n * bignum.recursive_fact(n-1)
-   end
-end
-
 --
 -- Recursive function to compute my factorial.
 -- ( should be a local but recursion apparently prevents this)
@@ -536,6 +554,20 @@ function bignum.len_digits(self)
    return retVal
 end
 
+function bignum.is_even(self)
+   local selfStr = self:__tostring()
+   local retVal = true
+   last_digit = selfStr:sub(-1)
+
+   for kk,val in ipairs(bignum.odd_less_than_ten)
+   do
+      if last_digit == val then
+        retVal = false
+	break
+      end
+   end
+   return retVal
+end
 --
 -- Find all factors of given number
 --
@@ -570,3 +602,4 @@ end
 -- Useful Constants ( should be read-only)
 bignum["zero"]=bignum.new(0)
 bignum["one"]=bignum.new(1)
+bignum["odd_less_than_ten"]={"1","3","5","7","9"}

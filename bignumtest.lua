@@ -120,6 +120,15 @@ function test_special()
    factors=twenty_five:find_factors()
    print("Factors of " .. twenty_five .. ":")
    useful.print_array(factors)
+   print("Largest power of 7 which is smaller than 850")
+   eight_fifty=bignum.new(850)
+   remainder,power = eight_fifty:find_biggest_pow(7)
+   
+   print("Power: " .. power:tostring() .. " Remainder: " .. remainder:tostring())
+   eventest=bignum.new(20000)
+   print( eventest .. " is even: " .. string.format("%s",eventest:is_even()) )
+   oddtest=eventest + 1
+   print( oddtest .. " is even: " .. string.format("%s",oddtest:is_even()) )
 end
 
 -- main line
