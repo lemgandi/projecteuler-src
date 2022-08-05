@@ -1,0 +1,64 @@
+Routines are just table entries that you can execute. Arguments are
+enclosed in (). "self" is an argument like any other, except that
+tablename:routine(arg) is syntactic sugar for tablename.routine(tablename,arg).
+
+So:
+
+
+require "table"
+
+first={}
+
+-- Required so I can see my routines
+first.__index=first
+
+function first.new(flag)
+
+   local my_first={}
+   
+   setmetatable(my_first,first)
+   my_first.flag=flag
+ 
+   return my_first
+end
+
+function first.noself(o)
+  print(o)
+end
+
+function first.withself(self,next)
+   self.noself(next)
+   print(self.flag)
+end
+
+Then:
+
+
+devel@antling: ~/projecteuler-src>
+
+Lua 5.3.3  Copyright (C) 1994-2016 Lua.org, PUC-Rio
+> dofile("first_self.lua")
+> onest=first.new("Onest")
+> twost=first.new("Twost")
+> onest.noself("okay")
+okay
+> onest.withself("not_ok")
+first_self.lua:21: attempt to call a nil value (field 'noself')
+stack traceback:
+	first_self.lua:21: in function <first_self.lua:20>
+	(...tail calls...)
+	[C]: in ?
+> onest:withself("Okay")
+Okay
+Onest
+> onest.withself(onest,"Okay")
+Okay
+Onest
+> twost:withself("Okay")
+Okay
+Twost
+> twost.withself(onest,"Okay")
+Okay
+Onest
+
+
