@@ -1,6 +1,7 @@
 Routines are just table entries that you can execute. Arguments are
 enclosed in (). "self" is an argument like any other, except that
 tablename:routine(arg) is syntactic sugar for tablename.routine(tablename,arg).
+tablename.routine is syntactic sugar for tablename["routine"].
 
 So:
 
@@ -61,4 +62,10 @@ Twost
 Okay
 Onest
 
-
+> twost["noself"]("Okay")
+  Okay
+>
+>twost["withself"](twost,"Okay")
+Okay
+Twost
+>
