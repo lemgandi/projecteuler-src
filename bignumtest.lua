@@ -33,6 +33,7 @@ function test_mul()
    print(next .. " ^ " .. pow .. " = " .. sum .. "")
    five=bignum.new(5)
    print( five .. " ! is " .. five:factorial() .. " (Should be 120)")
+   print(five .. " * 10 is " .. five:multen() .. " (should be 50)")
 end
 
 function test_sub()

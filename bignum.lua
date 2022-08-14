@@ -476,7 +476,7 @@ function bignum.new(t)
    end
 
    local fromtable=function(t)
-      my_bignum.my_num=t
+      useful.copytable(t,my_bignum.my_num)
    end
 
    local fromnil=function(t)
@@ -597,6 +597,23 @@ function bignum.__newindex(t,k,v)
    assert(k ~= "zero","Attempt to set read-only \"zero\" value")
    assert(k ~= "one", "Attempt to set read-only \"one\" value")
    rawset(t,k,v)      
+end
+
+--
+-- Multiply myself by ten
+--
+function bignum.multen(self,pow)
+   if ( pow == nil)
+   then
+      pow = 1
+   end
+   local retVal=bignum.new(self.my_num)
+   while pow > 0
+   do
+      table.insert(retVal.my_num,1,0)
+      pow = pow - 1
+   end
+   return retVal
 end
 
 -- Useful Constants ( should be read-only)
